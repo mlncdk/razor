@@ -1,0 +1,61 @@
+﻿@inherits Dynamicweb.Rendering.RazorTemplateBase<Dynamicweb.Rendering.RazorTemplateModel<Dynamicweb.Rendering.Template>>
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Razor</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" />
+    @RenderSnippet("StyleSheet")
+</head>
+<body>
+    @RenderNavigation(new
+   {
+       EndLevel = 2
+   })
+
+    <div class="container">
+        @ContentPlaceholder()
+
+        @GetValue("Item.Name")
+
+        <pre>
+@foreach (System.Collections.DictionaryEntry e in Pageview.Area.Values)
+{
+    @: @e.Key: @e.Value
+}
+</pre>
+
+        <pre>
+Second language: @GetLoop("WebsiteLanguages")[1].GetValue("Name")
+</pre>
+
+        @{
+            var languages = GetLoop("WebsiteLanguages");
+        }
+        @if (languages.Count > 1)
+        {
+            <ul class="languages list-inline" style="margin-top: 20em">
+                @foreach (var language in languages)
+                {
+                    <li data-culture='@language.GetValue("Culture")'>
+                        <a href='/Default.aspx?Id=@language.GetValue("FirstPageID")'>
+                            @language.GetValue("Name")
+                        </a>
+                        @if (GetString("Item.Name") == language.GetString("Name"))
+                        {
+                            <div>Do somthing</div>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+</body>
+</html>

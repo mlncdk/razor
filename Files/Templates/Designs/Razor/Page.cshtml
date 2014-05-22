@@ -1,0 +1,37 @@
+﻿@inherits Dynamicweb.Rendering.RazorTemplateBase<Dynamicweb.Rendering.RazorTemplateModel<Dynamicweb.Rendering.Template>>
+
+@MasterPageFile("Master.cshtml")
+
+@SnippetStart("StyleSheet")
+<style>
+    body {
+    }
+</style>
+@SnippetEnd("StyleSheet")
+
+
+
+<h1>@GetValue("Item.Name")</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="dwcontent" id="content" data-setting="template:item.cshtml"></div>
+    </div>
+    <div class="col-md-4">
+        <div class="dwcontent" id="sidebar"></div>
+    </div>
+</div>
+
+<fieldset>
+    <legend>Subpages</legend>
+    @RenderItemList(new
+       {
+           ItemType = "Page",
+           ListSourceType = "SelfPage",
+           ItemFieldsList = "*",
+           ListPageSize = 10,
+           ListOrderBy = "Name",
+           ListTemplate = "ItemPublisher/List/List.cshtml"
+       })
+</fieldset>
+
