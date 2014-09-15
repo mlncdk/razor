@@ -1,0 +1,78 @@
+﻿@helper DwObjectDump(object obj, string title = "«object»")
+{
+    var propertyPath = System.Web.HttpContext.Current.Request["dw-object-dump.property"];
+    var steps = string.IsNullOrWhiteSpace(propertyPath) ? new string[] { } : propertyPath.Trim('.').Split('.');
+
+    if (obj != null)
+    {
+        foreach (var step in steps)
+        {
+            var t = obj.GetType();
+            var p = t.GetProperty(step);
+            if (p == null)
+            {
+                obj = null;
+            }
+            else
+            {
+                obj = p.GetValue(obj, null);
+            }
+            if (obj == null)
+            {
+                break;
+            }
+        }
+    }
+
+    var propertyBaseUrl = System.Text.RegularExpressions.Regex.Replace(System.Web.HttpContext.Current.Request.Url.PathAndQuery, "[?&]dw-object-dump.property=[^&]*", "");
+    propertyBaseUrl += (propertyBaseUrl.Contains("?") ? "&" : "?") + "dw-object-dump.property=";
+
+    <section class="dw-object-dump">
+        <header class="dw-object-dump-path">
+            <a href="@propertyBaseUrl">@title</a>@{
+                var path = "";
+                foreach (var step in steps)
+                {
+                    propertyBaseUrl += "." + step;
+                    @:.<a href="@propertyBaseUrl">@step</a>
+                }
+            }
+        </header>
+        @if (obj == null)
+        {
+            @: (null)
+        }
+        else
+        {
+            var t = obj.GetType();
+            <table class="dw-object-dump-properties">
+                @foreach (var prop in t.GetProperties())
+                {
+                    <tr>
+                        <td>
+                            @if (prop.PropertyType.IsValueType)
+                            {
+                                @: @prop.Name
+                                }
+                            else
+                            {
+                                var url = propertyBaseUrl + "." + prop.Name;
+                                <a href="@url">@prop.Name</a>
+                            }
+                        </td>
+                        <td>
+                            @try
+                            {
+                                @: @prop.GetValue(obj, null)
+                            }
+                            catch (Exception e)
+                            {
+                            }
+                        </td>
+                        <td>@prop.PropertyType</td>
+                    </tr>
+                }
+            </table>
+        }
+    </section>
+}
